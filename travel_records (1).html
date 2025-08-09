@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Travel Records</title>
+  <style>
+    /* Reset + base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Noto Sans JP", "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; color:#222; background:#f5f5f5; line-height:1.6; }
+    a { color: inherit; text-decoration:none; }
+
+    /* Header */
+    header { background:#fff; border-bottom:1px solid #e6e6e6; position:sticky; top:0; z-index:20; }
+    .container { max-width:1100px; margin:0 auto; padding:20px; }
+    .site-title { font-weight:700; font-size:28px; letter-spacing:0.5px; }
+    nav { margin-top:12px; }
+    .nav-list { display:flex; gap:12px; align-items:center; flex-wrap:wrap; list-style:none; }
+    .nav-list li { padding:6px 10px; border-radius:6px; }
+    .nav-list li a:hover { background:#f0f0f0; }
+
+    /* Hero slider (full width) */
+    .hero-wrapper { width:100%; overflow:hidden; background:#ddd; }
+    .hero-track {
+      display:flex;
+      width:calc(100% * 5); /* number of slides + duplicate */
+      transform:translateX(0);
+      transition:transform 0.9s cubic-bezier(.22,.9,.35,1);
+    }
+    .hero-slide {
+      min-width:100%;
+      height:420px;
+      position:relative;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .hero-slide img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:grayscale(.05) contrast(.98);
+    }
+    .hero-caption {
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:28px;
+      background:rgba(255,255,255,0.85);
+      padding:10px 18px;
+      border-radius:8px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      font-weight:600;
+    }
+
+    /* Main layout */
+    main { max-width:1100px; margin:28px auto; padding:0 20px 80px; display:grid; grid-template-columns: 1fr 300px; gap:28px; }
+    @media (max-width:900px) { main { grid-template-columns:1fr; } .hero-slide { height:320px; } }
+
+    /* Blog list */
+    .post { background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 18px rgba(15,15,15,0.03); margin-bottom:18px; }
+    .post h2 { font-size:20px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+    .post h2 img { width:56px; height:56px; object-fit:cover; border-radius:6px; display:block; }
+    .post p.lead { color:#666; margin-bottom:12px; }
+
+    /* Sidebar */
+    aside .card { background:#fff; padding:16px; border-radius:10px; margin-bottom:16px; }
+
+    /* Footer */
+    footer { text-align:center; padding:30px 20px; color:#888; font-size:14px; }
+
+    /* small helpers */
+    .meta { font-size:13px; color:#999; margin-bottom:8px; }
+
+    /* navigation order: put "トップ" visually first */
+    .nav-first { background:#333; color:#fff; padding:8px 12px; border-radius:6px; }
+    .nav-first a { color:#fff; }
+
+    /* slider controls (hidden on mobile) */
+    .controls { position:absolute; right:18px; top:18px; display:flex; gap:8px; }
+    .control-btn { background:rgba(0,0,0,0.45); color:#fff; padding:6px 8px; border-radius:6px; cursor:pointer; font-size:13px; }
+    @media (max-width:600px) { .controls { display:none; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container" style="display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <!-- Top (英語) -->
+        <div class="site-title">Travel Records</div>
+        <div style="font-size:13px; color:#666;">A personal travel & life blog</div>
+      </div>
+
+      <nav aria-label="Main navigation" style="margin-top:8px;">
+        <ul class="nav-list">
+          <!-- 先頭は英語のまま、その他は日本語 -->
+          <li class="nav-first"><a href="#tabi">Travel Records</a></li>
+          <li><a href="#">ホーム</a></li>
+          <li><a href="#">ブログ</a></li>
+          <li><a href="#">写真ギャラリー</a></li>
+          <li><a href="#">プロフィール</a></li>
+          <li><a href="#">お問い合わせ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO (full width) -->
+  <section class="hero-wrapper" aria-label="ヒーロー画像">
+    <div class="hero-track" id="heroTrack">
+      <!-- Slides: use free placeholder images (replace URLs with your own images) -->
+      <div class="hero-slide">
+        <img src="https://picsum.photos/id/1015/1600/900" alt="sample 1">
+        <div class="hero-caption">旅の朝 — コーヒーと風景</div>
+      </div>
+      <div class="hero-slide">
+        <img src="https://picsum.photos/id/1016/1600/900" alt="sample 2">
+        <div class="hero-caption">街角のひととき</div>
+      </div>
+      <div class="hero-slide">
+        <img src="https://picsum.photos/id/1018/1600/900" alt="sample 3">
+        <div class="hero-caption">海辺の散歩</div>
+      </div>
+      <div class="hero-slide">
+        <img src="https://picsum.photos/id/1025/1600/900" alt="sample 4">
+        <div class="hero-caption">山とカフェ</div>
+      </div>
+      <!-- duplicate first slide to enable seamless loop -->
+      <div class="hero-slide">
+        <img src="https://picsum.photos/id/1015/1600/900" alt="sample 1 duplicate">
+        <div class="hero-caption">旅の朝 — コーヒーと風景</div>
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div class="controls" aria-hidden="true">
+      <div class="control-btn" id="prevBtn">◀</div>
+      <div class="control-btn" id="nextBtn">▶</div>
+    </div>
+  </section>
+
+  <main>
+    <section>
+      <!-- "旅の記録" anchor / topmost (見出しは日本語でOK) -->
+      <div id="tabi" style="margin-bottom:16px;">
+        <h1 style="font-size:24px; margin-bottom:8px;">旅の記録</h1>
+        <p style="color:#666; margin-bottom:12px;">ここが最上部のセクションです。旅のメモや写真、日記を綴ります。</p>
+      </div>
+
+      <!-- Blog posts (sample)。各見出しに個別画像を挿入 -->
+      <article class="post">
+        <div class="meta">2025-08-09 · 日本・東京</div>
+        <h2>
+          <img src="https://picsum.photos/id/1050/200/200" alt="都内カフェthumb">
+          都内カフェ巡り — 小さな発見
+        </h2>
+        <p class="lead">休日に歩きながら見つけた小さなカフェたち。静かな時間の過ごし方について。</p>
+        <p>ここに記事の抜粋が入ります。写真と一緒に訪れた場所の印象や、役立つメモを書き留めておきます。</p>
+      </article>
+
+      <article class="post">
+        <div class="meta">2025-07-18 · 北海道</div>
+        <h2>
+          <img src="https://picsum.photos/id/1060/200/200" alt="道北ドライブthumb">
+          夏の道北ドライブ
+        </h2>
+        <p class="lead">長距離ドライブで出会った海と空と小さな町。</p>
+        <p>ルート、宿のメモ、立ち寄りたいスポットなどをまとめた記事サンプルです。</p>
+      </article>
+
+      <article class="post">
+        <div class="meta">2025-06-02 · 京都</div>
+        <h2>
+          <img src="https://picsum.photos/id/1074/200/200" alt="京都thumb">
+          古都・京都散歩
+        </h2>
+        <p class="lead">寺社巡りと小路の発見。季節ごとの風景を楽しむコツ。</p>
+        <p>写真とともに歩いたルート、食べたもの、感想などをまとめます。</p>
+      </article>
+
+      <!-- 追加記事も同じ形式で増やせます -->
+    </section>
+
+    <aside>
+      <div class="card">
+        <h3 style="margin-bottom:8px;">プロフィール</h3>
+        <p style="color:#666;">多才系女子の個人ブログサンプル。旅と写真と生活の記録。</p>
+      </div>
+
+      <div class="card">
+        <h4 style="margin-bottom:8px;">人気記事</h4>
+        <ul style="list-style:none; padding-left:0; color:#444;">
+          <li style="margin-bottom:8px;"><a href="#">・北の大地の小さな宿</a></li>
+          <li style="margin-bottom:8px;"><a href="#">・自炊レシピ：簡単パスタ</a></li>
+          <li style="margin-bottom:8px;"><a href="#">・美術館で過ごす午後</a></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h4 style="margin-bottom:8px;">フォロー</h4>
+        <p style="color:#666;">SNSリンクや購読フォームをここに置くと便利です。</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    © Travel Records
+  </footer>
+
+  <script>
+    // HERO slider JavaScript
+    (function(){
+      const track = document.getElementById('heroTrack');
+      const slides = Array.from(track.children);
+      const slideCount = slides.length;
+      let index = 0;
+      let isAnimating = false;
+      const duration = 3000; // time between moves (ms)
+
+      // Set each slide's width (in case of resize)
+      function layout() {
+        const w = track.parentElement.clientWidth;
+        slides.forEach(s => s.style.minWidth = w + 'px');
+      }
+      window.addEventListener('resize', layout);
+      layout();
+
+      // Move to given index (0..slideCount-1)
+      function goTo(i, instant) {
+        if (instant) {
+          track.style.transition = 'none';
+        } else {
+          track.style.transition = 'transform 0.9s cubic-bezier(.22,.9,.35,1)';
+        }
+        const w = track.parentElement.clientWidth;
+        track.style.transform = 'translateX(' + (-i * w) + 'px)';
+      }
+
+      // Advance by 1, with seamless loop using duplicated slide at end
+      function next() {
+        if (isAnimating) return;
+        isAnimating = true;
+        index++;
+        goTo(index, false);
+
+        // When we reach the duplicated last slide, jump instantly back to real first
+        setTimeout(() => {
+          if (index >= slideCount - 1) {
+            // jump to real first slide (index 0) without transition
+            index = 0;
+            goTo(index, true);
+          }
+          isAnimating = false;
+        }, 950); // a bit longer than transition time
+      }
+
+      function prev() {
+        if (isAnimating) return;
+        isAnimating = true;
+        // if at start, jump to duplicate before moving
+        if (index === 0) {
+          const w = track.parentElement.clientWidth;
+          index = slideCount - 1;
+          goTo(index, true);
+          void track.offsetWidth;
+        }
+        index--;
+        goTo(index, false);
+        setTimeout(() => { isAnimating = false; }, 950);
+      }
+
+      // Auto-play
+      let timer = setInterval(next, duration);
+
+      // Pause on hover
+      track.parentElement.addEventListener('mouseenter', () => clearInterval(timer));
+      track.parentElement.addEventListener('mouseleave', () => {
+        clearInterval(timer);
+        timer = setInterval(next, duration);
+      });
+
+      // Controls
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      prevBtn && prevBtn.addEventListener('click', () => { clearInterval(timer); prev(); });
+      nextBtn && nextBtn.addEventListener('click', () => { clearInterval(timer); next(); });
+
+      // Touch swipe (mobile)
+      let startX = null;
+      track.parentElement.addEventListener('touchstart', (e) => {
+        clearInterval(timer);
+        startX = e.touches[0].clientX;
+      }, {passive:true});
+      track.parentElement.addEventListener('touchend', (e) => {
+        if (startX === null) return;
+        const endX = e.changedTouches[0].clientX;
+        const diff = endX - startX;
+        if (Math.abs(diff) > 40) {
+          if (diff < 0) next(); else prev();
+        }
+        startX = null;
+        clearInterval(timer);
+        timer = setInterval(next, duration);
+      });
+
+      // Ensure initial position correct (in case of layout changes)
+      goTo(0, true);
+    })();
+  </script>
+</body>
+</html>
